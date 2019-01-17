@@ -1,8 +1,9 @@
-let speed = 7
-let x = 100
+import { socket } from "./socket.js"
+let movement = {
+  right: false,
+  left: false
+}
 let y = 100
-let rightPressed = false
-let leftPressed = false
 let legRot = 0
 let isJumping = false
 let jumpCount = 0
@@ -12,10 +13,10 @@ document.addEventListener("keyup", keyUpHandler, false)
 
 function keyDownHandler(e) {
   if (e.key == "Right" || e.key == "ArrowRight") {
-    rightPressed = true
+    movement.right = true
   }
   if (e.key == "Left" || e.key == "ArrowLeft") {
-    leftPressed = true
+    movement.left = true
   }
   if (e.key == "Up" || e.key == "ArrowUp") {
     if (!isJumping) {
@@ -26,24 +27,24 @@ function keyDownHandler(e) {
 
 function keyUpHandler(e) {
   if (e.key == "Right" || e.key == "ArrowRight") {
-    rightPressed = false
+    movement.right = false
   }
   if (e.key == "Left" || e.key == "ArrowLeft") {
-    leftPressed = false
+    movement.left = false
   }
 }
 
 function movePlayer() {
-  if (leftPressed) {
+  if (movement.right) {
     x -= speed
   }
-  if (rightPressed) {
+  if (movement.left) {
     x += speed
   }
 }
 
 function legRotation() {
-  if (leftPressed || rightPressed) {
+  if (movement.left || movement.right) {
     if (legRot < 0) {
       legRot = 10
     } else {
@@ -69,26 +70,41 @@ function jumping(height, width) {
   }
 }
 
-export function drawPlayer(context) {
-  //body
-  context.beginPath()
-  context.fillStyle = "black"
-  context.fillRect(x, y, 20, 20)
-  context.closePath()
+export function drawPlayer(context, players) {
+  for (var id in players) {
+    var player = players[id]
+    //body
+    context.beginPath()
+    context.fillStyle = "black"
+    context.fillRect(x, y, 20, 20)
+    context.closePath()
 
-  // leg
-  context.beginPath()
-  context.moveTo(x + 15, y + 10)
-  context.lineTo(x + 15 + legRot, y + 40)
-  context.moveTo(x + 5, y + 10)
-  context.lineTo(x + 5 + legRot, y + 40)
-  context.lineWidth = 2
-  context.stroke()
-  context.closePath()
+    // leg
+    context.beginPath()
+    context.moveTo(x + 15, y + 10)
+    context.lineTo(x + 15 + legRot, y + 40)
+    context.moveTo(x + 5, y + 10)
+    context.lineTo(x + 5 + legRot, y + 40)
+    context.lineWidth = 2
+    context.stroke()
+    context.closePath()
+  }
 }
 
 export function updatePlayer(height, width) {
   movePlayer()
   legRotation()
   jumping(height, width)
+}
+
+socket.on("message", function(data) {
+  console.log(data)
+})
+socket.emit("new player")
+
+//todo move
+export function start() {
+  setInterval(function() {
+    socket.emit("movement", movement)
+  }, 1000 / 60)
 }
