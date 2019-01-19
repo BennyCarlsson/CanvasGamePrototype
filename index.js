@@ -1,28 +1,67 @@
-import { drawPlayer, updatePlayer, start } from "./src/player.js"
+import { updatePlayer } from "./src/player.js"
 import { socket } from "./src/socket.js"
 
 let gameCanvas = document.getElementById("gameCanvas")
 let context = gameCanvas.getContext("2d")
 
 function loop(players) {
-  update()
-  draw(players)
+  context.clearRect(0, 0, gameCanvas.width, gameCanvas.height)
+  updatePlayer(context, players)
   //requestAnimationFrame(loop)
 }
 
-function update() {
-  updatePlayer(gameCanvas.height, gameCanvas.width)
+let movement = {
+  right: false,
+  left: false,
+  up: false
 }
 
-function draw(players) {
-  context.clearRect(0, 0, gameCanvas.width, gameCanvas.height)
-  drawPlayer(context, players)
+function keyDownHandler(e) {
+  if (e.key == "Right" || e.key == "ArrowRight") {
+    movement.right = true
+  }
+  if (e.key == "Left" || e.key == "ArrowLeft") {
+    movement.left = true
+  }
+  if (e.key == "Up" || e.key == "ArrowUp") {
+    movement.up = true
+    if (!isJumping) {
+      isJumping = true
+    }
+  }
 }
 
+function keyUpHandler(e) {
+  if (e.key == "Right" || e.key == "ArrowRight") {
+    movement.right = false
+  }
+  if (e.key == "Left" || e.key == "ArrowLeft") {
+    movement.left = false
+  }
+  if (e.key == "Up" || e.key == "ArrowUp") {
+    movement.up = false
+  }
+}
+
+document.addEventListener("keydown", keyDownHandler, false)
+document.addEventListener("keyup", keyUpHandler, false)
+
+let consoleCount = 0
 socket.on("state", function(players) {
-  console.log(players)
+  if (consoleCount > 100) {
+    console.log(players)
+    console.log(consoleCount)
+    consoleCount = 0
+  }
+  consoleCount++
   loop(players)
 })
+
+function start() {
+  setInterval(function() {
+    socket.emit("movement", movement)
+  }, 1000 / 60)
+}
 
 window.onload = start()
 //setInterval(update, 10);
