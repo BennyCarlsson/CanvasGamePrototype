@@ -6,6 +6,11 @@ let context = gameCanvas.getContext("2d")
 
 function loop(players) {
   context.clearRect(0, 0, gameCanvas.width, gameCanvas.height)
+  var grd = context.createLinearGradient(0, 0, 200, 0)
+  grd.addColorStop(0, "#FF0844")
+  grd.addColorStop(1, "#FF4563")
+  context.fillStyle = grd
+  context.fillRect(0, 0, gameCanvas.width, gameCanvas.height)
   updatePlayer(context, players)
   //requestAnimationFrame(loop)
 }

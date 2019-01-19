@@ -28,16 +28,17 @@ function drawPlayer(context, players) {
     var player = players[id]
     //body
     context.beginPath()
-    context.fillStyle = "black"
-    context.fillRect(player.x, player.y, 20, 20)
+    context.fillStyle = "white"
+    context.fillRect(player.x, player.y, 10, 23)
     context.closePath()
 
     // leg
     context.beginPath()
-    context.moveTo(player.x + 15, player.y + 10)
-    context.lineTo(player.x + 15 + legRot, player.y + 40)
-    context.moveTo(player.x + 5, player.y + 10)
-    context.lineTo(player.x + 5 + legRot, player.y + 40)
+    context.moveTo(player.x + 8, player.y + 10)
+    context.lineTo(player.x + 8 + legRot, player.y + 32)
+    context.moveTo(player.x + 2, player.y + 10)
+    context.lineTo(player.x + 2 + legRot, player.y + 32)
+    context.strokeStyle = "white"
     context.lineWidth = 2
     context.stroke()
     context.closePath()
