@@ -1,43 +1,45 @@
 import { socket } from "./socket.js"
 
-let legRot = 0
+let lastPlayers = {}
+let currentPlayers = {}
 
-// function movePlayer() {
-//   if (movement.right) {
-//     x -= speed
-//   }
-//   if (movement.left) {
-//     x += speed
-//   }
-// }
+function getLegRotation(player, id) {
+  const lastPlayer = lastPlayers[id]
+  let legRotation = lastPlayer ? lastPlayer.legRotation : 0
+  if (lastPlayer && player.x !== lastPlayer.x) {
+    if (legRotation < 0) {
+      legRotation = 5
+    } else {
+      legRotation = -5
+    }
+  } else {
+    legRotation = 0
+  }
+  console.log(legRotation)
+  currentPlayers[id] = {
+    ...player,
+    legRotation
+  }
 
-// function legRotation() {
-//   if (movement.left || movement.right) {
-//     if (legRot < 0) {
-//       legRot = 10
-//     } else {
-//       legRot = -10
-//     }
-//   } else {
-//     legRot = 0
-//   }
-// }
+  return legRotation
+}
 
 function drawPlayer(context, players) {
-  for (var id in players) {
-    var player = players[id]
+  for (let id in players) {
+    const player = players[id]
+    const legRotation = getLegRotation(player, id)
     //body
     context.beginPath()
     context.fillStyle = "white"
     context.fillRect(player.x, player.y, 10, 23)
     context.closePath()
 
-    // leg
+    // legs
     context.beginPath()
     context.moveTo(player.x + 8, player.y + 10)
-    context.lineTo(player.x + 8 + legRot, player.y + 32)
+    context.lineTo(player.x + 8 + legRotation, player.y + 32)
     context.moveTo(player.x + 2, player.y + 10)
-    context.lineTo(player.x + 2 + legRot, player.y + 32)
+    context.lineTo(player.x + 2 + legRotation, player.y + 32)
     context.strokeStyle = "white"
     context.lineWidth = 2
     context.stroke()
@@ -46,8 +48,7 @@ function drawPlayer(context, players) {
 }
 
 export function updatePlayer(context, players) {
-  //movePlayer()
-  //legRotation()
   drawPlayer(context, players)
+  lastPlayers = currentPlayers
 }
 socket.emit("new player")

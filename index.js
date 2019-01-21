@@ -55,7 +55,6 @@ let consoleCount = 0
 socket.on("state", function(players) {
   if (consoleCount > 100) {
     console.log(players)
-    console.log(consoleCount)
     consoleCount = 0
   }
   consoleCount++
